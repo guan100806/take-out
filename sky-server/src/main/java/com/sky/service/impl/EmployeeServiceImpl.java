@@ -72,11 +72,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         BeanUtils.copyProperties(employee, emp);
         emp.setStatus(StatusConstant.ENABLE);
         emp.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
-        emp.setCreateTime(LocalDateTime.now());
-        emp.setUpdateTime(LocalDateTime.now());
+//        emp.setCreateTime(LocalDateTime.now());
+//        emp.setUpdateTime(LocalDateTime.now());
         // 设置创建人和修改人id,给默认值L10
-        emp.setCreateUser(BaseContext.getCurrentId());
-        emp.setUpdateUser(BaseContext.getCurrentId());
+//        emp.setCreateUser(BaseContext.getCurrentId());
+//        emp.setUpdateUser(BaseContext.getCurrentId());
 
         employeeMapper.insert(emp);
     }
