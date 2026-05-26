@@ -11,3 +11,6 @@ sky:
     access-key-secret:
     endpoint:
     bucket-name:
+  redis:
+    host: 23.254.199.157
+    port: 6379
