@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -88,7 +89,7 @@ public class DishServiceImpl implements DishService {
         }
 
         // 判断当前菜品是否被套餐引用，如果被引用，则无法删除
-        List<Long> setmealIdsByDishId = setmealDishMapper.getSetmealIdsByDishId(ids);
+        List<Long> setmealIdsByDishId = setmealDishMapper.getSetmealIdsByDishIds(ids);
         if (setmealIdsByDishId != null && setmealIdsByDishId.size() > 0) {
             throw new RuntimeException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
         }
@@ -134,6 +135,30 @@ public class DishServiceImpl implements DishService {
             flavors.forEach(dishFlavor -> dishFlavor.setDishId(dishDTO.getId()));
             dishFlavorMapper.insertBatch(flavors);
         }
+    }
+
+    /**
+     * 条件查询菜品和口味
+     * @param dish
+     * @return
+     */
+    public List<DishVO> listWithFlavor(Dish dish) {
+        List<Dish> dishList = dishMapper.list(dish);
+
+        List<DishVO> dishVOList = new ArrayList<>();
+
+        for (Dish d : dishList) {
+            DishVO dishVO = new DishVO();
+            BeanUtils.copyProperties(d,dishVO);
+
+            //根据菜品id查询对应的口味
+            List<DishFlavor> flavors = dishFlavorMapper.getByDishId(d.getId());
+
+            dishVO.setFlavors(flavors);
+            dishVOList.add(dishVO);
+        }
+
+        return dishVOList;
     }
 
 }
