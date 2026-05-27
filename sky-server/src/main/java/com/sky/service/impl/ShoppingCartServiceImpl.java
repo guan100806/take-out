@@ -1,6 +1,7 @@
 package com.sky.service.impl;
 
 import com.sky.context.BaseContext;
+import com.sky.exception.BaseException;
 import com.sky.dto.ShoppingCartDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.Setmeal;
@@ -26,6 +27,7 @@ public class ShoppingCartServiceImpl implements ShoppongCartService {
     private DishMapper dishMapper;
     @Autowired
     private SetmealMapper setmealMapper;
+
     @Override
     public void add(ShoppingCartDTO shoppingCartDto) {
         // 判断当前加入购物车的商品是否存在了
@@ -55,5 +57,39 @@ public class ShoppingCartServiceImpl implements ShoppongCartService {
             }
             shoppingCartMapper.insert(shoppingCart);
         }
+    }
+
+    @Override
+    public void sub(ShoppingCartDTO shoppingCartDto) {
+        ShoppingCart shoppingCart = new ShoppingCart();
+        BeanUtils.copyProperties(shoppingCartDto, shoppingCart);
+        shoppingCart.setUserId(BaseContext.getCurrentId());
+
+        List<ShoppingCart> list = shoppingCartMapper.list(shoppingCart);
+        if (list == null || list.isEmpty()) {
+            throw new BaseException("购物车中不存在当前商品");
+        }
+
+        ShoppingCart cart = list.get(0);
+        if (cart.getNumber() > 1) {
+            cart.setNumber(cart.getNumber() - 1);
+            shoppingCartMapper.update(cart);
+            return;
+        }
+
+        shoppingCartMapper.deleteById(cart.getId());
+    }
+
+    @Override
+    public List<ShoppingCart> showShoppingCart() {
+        ShoppingCart shoppingCart = ShoppingCart.builder()
+                .userId(BaseContext.getCurrentId())
+                .build();
+        return shoppingCartMapper.list(shoppingCart);
+    }
+
+    @Override
+    public void clean() {
+        shoppingCartMapper.deleteByUserId(BaseContext.getCurrentId());
     }
 }
